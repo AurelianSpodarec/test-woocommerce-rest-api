@@ -22,26 +22,23 @@
         $post = get_posts($args);
         $product = wc_get_product( $post[0]->ID );
 
-        $data = [
-            'name' => $product->get_name(),
-            'price' => $product->get_price(),
-            'regular_price' => $product->get_regular_price(),
-            'sale_price' => $product->get_sale_price(),
-            'sale_from' => $product->get_date_on_sale_from(),
-            'sale_to' => $product->get_date_on_sale_to(),
+            $data = [
+                'name' => $product->get_name(),
+                'price' => $product->get_price(),
+                'regular_price' => $product->get_regular_price(),
+                'sale_price' => $product->get_sale_price(),
+                'sale_from' => $product->get_date_on_sale_from(),
+                'sale_to' => $product->get_date_on_sale_to(),
 
-            'stock_quantity' => $product->get_stock_quantity(),
+                'stock_quantity' => $product->get_stock_quantity(),
 
-
-            'images' => [$product->get_image()],
-            'colors' => array($product->get_attribute( 'color' )),
-            'imagess' => $product->get_gallery_image_ids(),
-            'variations' => $product->get_children(),
-            'test' => $product->get_attributes(),
-            'test2' => $product->get_default_attributes(),
-            'test3' => $product->get_attribute( 'attributeid' ), //get specific attribute value
-  
-        ];
+             
+                
+                'colors' => array($product->get_attribute( 'color' )),
+                'images' => $product->get_image(),
+                'variations' => $product->get_children(),
+            ];
+        
         
         if ( empty( $post ) ) {
             return null;
@@ -53,6 +50,7 @@
     function products_by_slug_variation( $slug ) {
         global $product;
 
+        // Check if variations exist, if not, return normal single
         $args = array (
             'post_type' => 'product',
             'name' => $slug['slug']
@@ -61,15 +59,64 @@
         $post = get_posts($args);
         $product = wc_get_product( $post[0]->ID );
 
-        $data = [
-            'name' => $product->get_name(),
-            'price' => $product->get_price(),
-            'regular_price' => $product->get_regular_price(),
- 
 
-            "variations" => $variations = $product->get_available_variations()
-  
-        ];
+        $attachment_ids[0] = get_post_thumbnail_id( $product->id );
+        $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
+
+        if($product->has_child()) {
+            $variations = $product->get_available_variations();
+            $data = [
+                'name' => $product->get_name(),
+                'price' => $product->get_price(),
+                'regular_price' => $product->get_regular_price(),
+                'sale_price' => $product->get_sale_price(),
+                'image' => $product->get_image(),
+                'stock_quantity' => $product->get_stock_quantity(),
+                'stock_status' => $product->get_stock_status(),
+                'backorders' => $product->get_backorders(),
+                "variations" => $variations = $product->get_available_variations(),
+                
+                'description' => $product->get_description(),
+
+                'weight' => $product->get_weight(),
+                'length' => $product->get_length(),
+                'width' => $product->get_width(),
+                'height' => $product->get_height(),
+                'dimensions' => $product->get_dimensions(),
+
+                'reviews_allowed' => $product->get_reviews_allowed(),
+                'rating_counts' => $product->get_rating_counts(),
+                'get_average_rating' => $product->get_average_rating(),
+                'get_review_count' => $product->get_review_count()
+
+            ];
+        } else {
+            $data = [
+                'name' => $product->get_name(),
+                'price' => $product->get_price(),
+                'regular_price' => $product->get_regular_price(),
+                'sale_price' => $product->get_sale_price(),
+
+                'stock_quantity' => $product->get_stock_quantity(),
+                'stock_status' => $product->get_stock_status(),
+                'backorders' => $product->get_backorders(),
+                'image' => $attachment,
+
+                'description' => $product->get_description(),
+                 
+                'weight' => $product->get_weight(),
+                'length' => $product->get_length(),
+                'width' => $product->get_width(),
+                'height' => $product->get_height(),
+                'dimensions' => $product->get_dimensions(),
+
+                'reviews_allowed' => $product->get_reviews_allowed(),
+                'rating_counts' => $product->get_rating_counts(),
+                'get_average_rating' => $product->get_average_rating(),
+                'get_review_count' => $product->get_review_count()
+            ];
+        }
+        
         
         if ( empty( $post ) ) {
             return null;
@@ -78,6 +125,57 @@
         return $data;
     }
 
+    function custom_product_list(   ) {
+        global $product;
+
+        // Check if variations exist, if not, return normal single
+        // $args = array (
+        //     'post_type' => 'product',
+        // );
+
+        // $post = get_posts($args);
+        // $product = wc_get_product(  );
+        //     $data = [
+        //         'name' => $product->get_name(),
+       
+
+        //     ];
+        $query = new WC_Product_Query( array(
+            'limit' => 10,
+            'orderby' => 'date',
+            'order' => 'DESC',
+            'return' => 'ids',
+        ) );
+        $products = $query->get_products();
+        
+        $product = wc_get_product(15);
+        
+        
+        $variations = $product->get_available_variations();
+        // "variations" => $variations = $product->get_available_variations(),
+
+      
+        
+        foreach($variations as $variation) {
+            $var = [
+                "attributes" => $variation['attributes'],
+                "image" => $variation['image']['src'],
+            ];
+           $product_variation[] = $var;
+        }
+        $product_variation;
+
+        $data = [
+            'name' => $product->get_name(),
+            'price' => $product->get_price(),
+            'custom_variations' => $product_variation
+        ];
+        // if ( empty( $post ) ) {
+        //     return null;
+        // }
+        // print_r($slug);
+        return $data;
+    }
 
     
     add_action('rest_api_init', 'register_routes');
@@ -90,6 +188,10 @@
         register_rest_route( 'wc/v3', '/product/slug=(?P<slug>[a-zA-Z0-9-]+)/variations', array(
             'method' => 'GET',
             'callback' => 'products_by_slug_variation'
+        ));
+        register_rest_route( 'wc/v3', '/custom-product-list', array(
+            'method' => 'GET',
+            'callback' => 'custom_product_list'
         ));
     }
 
