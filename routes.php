@@ -145,16 +145,26 @@
             'orderby' => 'date',
             'order' => 'DESC',
             'return' => 'ids',
+            'paginate' => true,
         ) );
         $products = $query->get_products();
-        
         $product = wc_get_product(15);
-        
-        
-        $variations = $product->get_available_variations();
-        // "variations" => $variations = $product->get_available_variations(),
 
-      
+
+
+        // foreach($products as $productID) {
+        //     $product_item = wc_get_product($productID);
+
+
+
+            
+        //     $product[] = $product_item;  
+        // }
+
+        // $product;
+
+
+        $variations = $product->get_available_variations();
         
         foreach($variations as $variation) {
             $var = [
@@ -165,15 +175,24 @@
         }
         $product_variation;
 
+        $attachment_ids[0] = get_post_thumbnail_id( $product->id );
+        $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
+
         $data = [
+            // 'total' => $products->total, // total number of products
             'name' => $product->get_name(),
             'price' => $product->get_price(),
+            'sale_price' => $product->get_sale_price(),
+            // 'attributes' => $product->get_attributes(),
+            'image' => $attachment,
+            
             'custom_variations' => $product_variation
         ];
-        // if ( empty( $post ) ) {
+
+        // if ( empty( $products ) ) {
         //     return null;
         // }
-        // print_r($slug);
+
         return $data;
     }
 
