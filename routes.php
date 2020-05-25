@@ -125,21 +125,9 @@
         return $data;
     }
 
-    function custom_product_list(   ) {
+    function custom_product_list() {
         global $product;
 
-        // Check if variations exist, if not, return normal single
-        // $args = array (
-        //     'post_type' => 'product',
-        // );
-
-        // $post = get_posts($args);
-        // $product = wc_get_product(  );
-        //     $data = [
-        //         'name' => $product->get_name(),
-       
-
-        //     ];
         $query = new WC_Product_Query( array(
             'limit' => 10,
             'orderby' => 'date',
@@ -147,53 +135,69 @@
             'return' => 'ids',
             'paginate' => true,
         ) );
-        $products = $query->get_products();
-        $product = wc_get_product(15);
-
-
-
-        // foreach($products as $productID) {
-        //     $product_item = wc_get_product($productID);
-
-
-
-            
-        //     $product[] = $product_item;  
-        // }
-
-        // $product;
-
-
-        $variations = $product->get_available_variations();
         
-        foreach($variations as $variation) {
-            $var = [
-                "attributes" => $variation['attributes'],
-                "image" => $variation['image']['src'],
-            ];
-           $product_variation[] = $var;
-        }
-        $product_variation;
 
-        $attachment_ids[0] = get_post_thumbnail_id( $product->id );
-        $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
+        $products = $query->get_products();
+        
 
-        $data = [
-            // 'total' => $products->total, // total number of products
-            'name' => $product->get_name(),
-            'price' => $product->get_price(),
-            'sale_price' => $product->get_sale_price(),
-            // 'attributes' => $product->get_attributes(),
-            'image' => $attachment,
+
+        foreach($products->products as $productID) {
+            $attachment_ids[0] = get_post_thumbnail_id( $productID );
+            $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
             
-            'custom_variations' => $product_variation
-        ];
+            $product_item = wc_get_product($productID);
 
-        // if ( empty( $products ) ) {
-        //     return null;
-        // }
+            // $product_item = wc_get_product(15);
 
-        return $data;
+            // $test = ["SS", $product_item->get_available_variations()];
+
+            // if($product_item->has_child()) {
+            //     $test = $product_item->get_available_variations();
+            // } else {
+            //     $test = "no";
+            // }
+
+            // $product = wc_get_product($productID);
+            // $producttt->wc_get_product($productID);
+
+                $product_variation = [];
+                if($product_item->has_child()) {
+                    $variations = $product_item->get_available_variations();
+                    foreach($variations as $variation) {
+                        $var = [
+                            "attributes" => $variation['attributes'],
+                            "image" => $variation['image']['src'],
+                        ];
+                        $product_variation[] = $var;
+                    }
+                }
+                if($product_item->has_child()) {
+                $data = [
+                    // 'total' => $products->total, // total number of products
+                    'name' => $product_item->get_name(),
+                    'price' => $product_item->get_price(),
+                    'sale_price' => $product_item->get_sale_price(),
+                    'image' => $attachment,
+                    'attributes' => $product_item->get_attributes(),
+                    'custom_variations' => $product_variation 
+                ];
+            } else {
+                $data = [
+                    // 'total' => $products->total, // total number of products
+                    'name' => $product_item->get_name(),
+                    'price' => $product_item->get_price(),
+                    'sale_price' => $product_item->get_sale_price(),
+                    'image' => $attachment,
+                    'attributes' => $product_item->get_attributes(),
+                ];
+            }
+               
+           
+            $p_list[] = $data;  
+        }
+
+        return $p_list;
+        // return $test;
     }
 
     
