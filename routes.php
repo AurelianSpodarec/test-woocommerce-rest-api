@@ -125,41 +125,41 @@
         return $data;
     }
 
+
+
+
+
     function custom_product_list() {
         global $product;
 
         $query = new WC_Product_Query( array(
-            'limit' => 10,
-            'orderby' => 'date',
-            'order' => 'DESC',
-            'return' => 'ids',
+            'limit'    => 10,
+            'orderby'  => 'date',
+            'order'    => 'DESC',
+            'return'   => 'ids',
             'paginate' => true,
         ) );
-        
 
         $products = $query->get_products();
-            
-
-        // $testp = wc_get_product(15);
-        //   // max min price
-        //   if( $testp->is_type('variable') ) {
-        //     $test = [               
-        //         'max_price' => $testp->get_variation_regular_price('max'),
-        //             'min_price' => $testp->get_variation_price('min')
-        //     ];
-        // }
 
 
+        $productResults = [
+            "total"    => $products->total,
+            "products" => [],
+        ];
 
-        foreach($products->products as $productID) {
+
+        if ( sizeof($products) > 0 ) :
+        foreach($products->products as $productID) :
+
             $attachment_ids[0] = get_post_thumbnail_id( $productID );
             $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
-            $product_item = wc_get_product($productID);
+            $custom_product = wc_get_product($productID);
 
 
             $product_variation = [];
-            if($product_item->has_child()) {
-                $variations = $product_item->get_available_variations();
+            if($custom_product->has_child()) {
+                $variations = $custom_product->get_available_variations();
                 foreach($variations as $variation) {
                     $var = [
                         "attributes" => $variation['attributes'],
@@ -170,54 +170,40 @@
             }
 
 
-               
-            // if( $$product_item-->is_type('variable') ) {
-                // $test = [               
-                //     'max_price' => $product_item-->get_variation_regular_price('max'),
-                //         'min_price' => $product_item-->get_variation_price('min')
-                // ];
-            // };
+            if($custom_product->has_child()) {   
+                    $custom_variations = $product_variation;
 
-            if($product_item->has_child()) {
-               
-                $data = [
-                    // 'total' => $products->total, // total number of products
-                    'name' => $product_item->get_name(),
-                    'price' => $product_item->get_price(),
-                    'sale_price' => $product_item->get_sale_price(),
-                    'image' => $attachment,
-                    'custom_variations' => $product_variation,
-                    // 'max_price' => $product_item-->get_variation_regular_price('max')
-                    
-                ];
+                    $variationPrice = [
+                        'min' => $custom_product->get_variation_price(),
+                        'max' => $custom_product->get_variation_price('max')
+                    ];
+
             } else {
-                $data = [
-                    // 'total' => $products->total, // total number of products
-                    'name' => $product_item->get_name(),
-                    'price' => $product_item->get_price(),
-                    'sale_price' => $product_item->get_sale_price(),
-
-                    // 'max_price' => $product_item->get_variation_regular_price('max'),
-                    // 'min_price' => $product_item->get_variation_price(),
-
-                    'image' => $attachment,
-                    'color' => strtolower($product_item->get_attribute('Color'))
-                ];
+                    $variationPrice = ['min' => '', 'max' => ''];
+                    $custom_variations = [];
             }
+             
 
-          
+            array_push( $productResults['products'], [
+                'name' => $custom_product->get_name(),
+                'price' => $custom_product->get_price(),
+                'currency' => get_woocommerce_currency_symbol(),
+                
+                'image' => $attachment,
+                'variationPrice' => $variationPrice,
+
+                // 'color' => $color = strtolower($custom_product->get_attribute('Color')),
+
+                'custom_variations' => $product_variation
+            ]);
+
+        endforeach;
+        endif;
+    
        
+    
 
-            $p_list[] = $data;  
-
-            $as = [
-                "total" => $products->total,
-                "products" => $p_list,
-            ];
-
-        }
-
-        return $as;
+        return $productResults;
     }
 
     
