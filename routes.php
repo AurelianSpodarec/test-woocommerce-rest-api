@@ -50,7 +50,6 @@
     function products_by_slug_variation( $slug ) {
         global $product;
 
-        // Check if variations exist, if not, return normal single
         $args = array (
             'post_type' => 'product',
             'name' => $slug['slug']
@@ -58,7 +57,6 @@
 
         $post = get_posts($args);
         $product = wc_get_product( $post[0]->ID );
-
 
         $attachment_ids[0] = get_post_thumbnail_id( $product->id );
         $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
@@ -72,6 +70,10 @@
                 'sale_price' => $product->get_sale_price(),
                 'image' => $product->get_image(),
                 'stock_quantity' => $product->get_stock_quantity(),
+
+                'stock_quantity' => $product->get_available_variations(),
+
+
                 'stock_status' => $product->get_stock_status(),
                 'backorders' => $product->get_backorders(),
                 "variations" => $variations = $product->get_available_variations(),
@@ -98,6 +100,8 @@
                 'sale_price' => $product->get_sale_price(),
 
                 'stock_quantity' => $product->get_stock_quantity(),
+
+
                 'stock_status' => $product->get_stock_status(),
                 'backorders' => $product->get_backorders(),
                 'image' => $attachment,
@@ -121,7 +125,7 @@
         if ( empty( $post ) ) {
             return null;
         }
-        // print_r($slug);
+
         return $data;
     }
 
@@ -132,17 +136,34 @@
     function custom_product_list() {
         global $product;
 
+        $currentPage = 1;
+        $productsPerPage = 2;
+        $totalPages = ceil($total / $limit);
+
+        $offset = ($currentPage - 1) * $productsPerPage;
+
+      
+
+
         $query = new WC_Product_Query( array(
-            'limit'    => 10,
+            'limit'    => $productsPerPage,
+            'offset' => $offset,
+
+
             'orderby'  => 'date',
             'order'    => 'DESC',
             'return'   => 'ids',
             'paginate' => true,
         ) );
 
+
+
+
+
+
+
+
         $products = $query->get_products();
-
-
         $productResults = [
             "total"    => $products->total,
             "products" => [],
@@ -153,8 +174,8 @@
         foreach($products->products as $productID) :
 
             $attachment_ids[0] = get_post_thumbnail_id( $productID );
-            $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
-            $custom_product = wc_get_product($productID);
+            $attachment        = wp_get_attachment_image_src($attachment_ids[0], false );
+            $custom_product    = wc_get_product($productID);
 
 
             $product_variation = [];
@@ -163,7 +184,7 @@
                 foreach($variations as $variation) {
                     $var = [
                         "attributes" => $variation['attributes'],
-                        "image" => $variation['image']['src'],
+                        "image"      => $variation['image']['src'],
                     ];
                     $product_variation[] = $var;
                 }
@@ -177,31 +198,31 @@
                         'min' => $custom_product->get_variation_price(),
                         'max' => $custom_product->get_variation_price('max')
                     ];
+                    $color = "";
 
             } else {
-                    $variationPrice = ['min' => '', 'max' => ''];
+                    $variationPrice = "";
                     $custom_variations = [];
+                    $color = $custom_product->get_attribute('Color');
             }
              
 
             array_push( $productResults['products'], [
-                'name' => $custom_product->get_name(),
-                'price' => $custom_product->get_price(),
-                'currency' => get_woocommerce_currency_symbol(),
-                
-                'image' => $attachment,
-                'variationPrice' => $variationPrice,
+                'name'              => $custom_product->get_name(),
+                'slug'              => $custom_product->get_slug(),
+                'price'             => $custom_product->get_price(),
+                'currency'          => get_woocommerce_currency_symbol(),
 
-                // 'color' => $color = strtolower($custom_product->get_attribute('Color')),
+                'image'             => $attachment,
+                'variationPrice'    => $variationPrice,
 
-                'custom_variations' => $product_variation
+                'custom_variations' => $product_variation,
+                'color' => $color
+
             ]);
 
         endforeach;
         endif;
-    
-       
-    
 
         return $productResults;
     }
