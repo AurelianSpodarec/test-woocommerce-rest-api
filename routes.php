@@ -138,48 +138,57 @@
         
 
         $products = $query->get_products();
-        
+            
+
+        // $testp = wc_get_product(15);
+        //   // max min price
+        //   if( $testp->is_type('variable') ) {
+        //     $test = [               
+        //         'max_price' => $testp->get_variation_regular_price('max'),
+        //             'min_price' => $testp->get_variation_price('min')
+        //     ];
+        // }
+
 
 
         foreach($products->products as $productID) {
             $attachment_ids[0] = get_post_thumbnail_id( $productID );
             $attachment = wp_get_attachment_image_src($attachment_ids[0], false );
-            
             $product_item = wc_get_product($productID);
 
-            // $product_item = wc_get_product(15);
 
-            // $test = ["SS", $product_item->get_available_variations()];
-
-            // if($product_item->has_child()) {
-            //     $test = $product_item->get_available_variations();
-            // } else {
-            //     $test = "no";
-            // }
-
-            // $product = wc_get_product($productID);
-            // $producttt->wc_get_product($productID);
-
-                $product_variation = [];
-                if($product_item->has_child()) {
-                    $variations = $product_item->get_available_variations();
-                    foreach($variations as $variation) {
-                        $var = [
-                            "attributes" => $variation['attributes'],
-                            "image" => $variation['image']['src'],
-                        ];
-                        $product_variation[] = $var;
-                    }
+            $product_variation = [];
+            if($product_item->has_child()) {
+                $variations = $product_item->get_available_variations();
+                foreach($variations as $variation) {
+                    $var = [
+                        "attributes" => $variation['attributes'],
+                        "image" => $variation['image']['src'],
+                    ];
+                    $product_variation[] = $var;
                 }
-                if($product_item->has_child()) {
+            }
+
+
+               
+            // if( $$product_item-->is_type('variable') ) {
+                // $test = [               
+                //     'max_price' => $product_item-->get_variation_regular_price('max'),
+                //         'min_price' => $product_item-->get_variation_price('min')
+                // ];
+            // };
+
+            if($product_item->has_child()) {
+               
                 $data = [
                     // 'total' => $products->total, // total number of products
                     'name' => $product_item->get_name(),
                     'price' => $product_item->get_price(),
                     'sale_price' => $product_item->get_sale_price(),
                     'image' => $attachment,
-                    'attributes' => $product_item->get_attributes(),
-                    'custom_variations' => $product_variation 
+                    'custom_variations' => $product_variation,
+                    // 'max_price' => $product_item-->get_variation_regular_price('max')
+                    
                 ];
             } else {
                 $data = [
@@ -187,17 +196,28 @@
                     'name' => $product_item->get_name(),
                     'price' => $product_item->get_price(),
                     'sale_price' => $product_item->get_sale_price(),
+
+                    // 'max_price' => $product_item->get_variation_regular_price('max'),
+                    // 'min_price' => $product_item->get_variation_price(),
+
                     'image' => $attachment,
-                    'attributes' => $product_item->get_attributes(),
+                    'color' => strtolower($product_item->get_attribute('Color'))
                 ];
             }
-               
-           
+
+          
+       
+
             $p_list[] = $data;  
+
+            $as = [
+                "total" => $products->total,
+                "products" => $p_list,
+            ];
+
         }
 
-        return $p_list;
-        // return $test;
+        return $as;
     }
 
     
@@ -220,9 +240,6 @@
 
     
 
-    // function add_custom_users_api(){
-    //     register_rest_route( 'mmw/v1', '/users/market=(?P<market>[a-zA-Z0-9-]+)/lat=(?P<lat>[a-z0-9 .\-]+)/long=(?P<long>[a-z0-9 .\-]+)', array(
-    //         'methods' => 'GET',
-    //         'callback' => 'get_custom_users_data',
-    //     ));
+    // function get_min_max_woocommerce() {
+
     // }
