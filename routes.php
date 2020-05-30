@@ -233,9 +233,12 @@
     }
 
     function filter_options() {
-        $limit = get_terms()
 
-        return  $limit;
+        // $response
+
+        $terms = get_terms("pa_color");
+
+        return  $terms;
     }
     
     add_action('rest_api_init', 'register_routes');
