@@ -68,7 +68,7 @@
                 'price' => $product->get_price(),
                 'regular_price' => $product->get_regular_price(),
                 'sale_price' => $product->get_sale_price(),
-                'image' => $product->get_image(),
+                'image' => $attachment,
                 'stock_quantity' => $product->get_stock_quantity(),
 
                 'stock_quantity' => $product->get_available_variations(),
@@ -143,7 +143,11 @@
 
         $offset = 0;
         $limit = 9;
+
         $page = $custom_page['custom_page'];
+        
+
+        // Write a function that gets all posts between x and Y price
       
 
 
@@ -228,10 +232,15 @@
         return $productResults;
     }
 
+    function filter_options() {
+        $limit = get_terms()
+
+        return  $limit;
+    }
     
     add_action('rest_api_init', 'register_routes');
-
     function register_routes() {
+        
         register_rest_route( 'wc/v3', '/product/slug=(?P<slug>[a-zA-Z0-9-]+)', array(
             'method' => 'GET',
             'callback' => 'single_product_by_slug'
@@ -240,7 +249,10 @@
             'method' => 'GET',
             'callback' => 'products_by_slug_variation'
         ));
-
+        register_rest_route( 'wc/v3', '/filter-options', array(
+            'method' => 'GET',
+            'callback' => 'filter_options'
+        ));
         register_rest_route( 'wc/v3', '/custom-product-list(?:/(?P<custom_page>\d+))?', array(
             'method' => 'GET',
             'callback' => 'custom_product_list',
@@ -248,10 +260,9 @@
                 'custom_page'
             ],
         ));
-      
-
+        
     }
-
+    
     
 
 // filter[limit]=25&filter[offset]="+offset;
