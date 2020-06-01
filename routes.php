@@ -132,47 +132,70 @@
 
 
     // , $fr_products_per_page
-    function custom_product_list( $custom_page ) {
+    function custom_product_list( $args ) {
         global $product;
 
-        // $currentPage = $custom_page;
-        // $productsPerPage = 2;
-        // $totalPages = ceil($total / $limit);
-
-        // $offset = ($currentPage - 1) * $productsPerPage;
 
         $offset = 0;
         $limit = 9;
-
-        $page = $custom_page['custom_page'];
         
+        $custom_page = $args['page'];
+        // $custom_colors = $args['colors'];
 
-        // Write a function that gets all posts between x and Y price
-      
+
+        // $custom_page = "papa";
+        // $custom_colors = "tes";
+        
+        // var_dump($args['page']);
+
+        // Search products between X and Y price
 
 
         $query = new WC_Product_Query( array(
-            // 'limit'    => $productsPerPage,
-            // 'offset' => $offset,
-            'page'   => $page,
+            'page'   => $custom_page,
             'limit' => $limit,
             'paginate' => true,
 
             'orderby'  => 'date',
             'order'    => 'DESC',
             'return'   => 'ids',
+            'orderby' => 'price',
             'paginate' => true,
+            // 'meta_query'     => array( 
+            //     array(
+            //         'key' => '_regular_price',
+            //         'value' => array(50, 100),
+            //         'compare' => 'BETWEEN',
+            //         'type' => 'NUMERIC'
+            //     )
+            
+            // ),
+            // 'tax_query'      => array( array(
+            //     'taxonomy'        => 'pa_color',
+            //     'field'           => 'slug',
+            //     'terms'           =>  array('red'),
+            //     'operator'        => 'IN',
+            // ) ),
+            
         ) );
  
+        // $args = array (
+        //     'value' => array( 20, 30 ),  
+        // );
+        // $min_max_price = wc_get_min_max_price_meta_query(  $args );
 
         $products = $query->get_products();
 
         $productResults = [
             "total"    => $products->total,
             "offset"   => $offset,
-            "page"     => $page,
+            "page"     => $custom_page,
             "limit"    => $limit,
             "products" => [],
+            // "pageee" => $page,
+            "colors" => $custom_colors,
+            "test " => $test,
+            // "args" => $args['custom_page']
         ];
 
         if ( sizeof($products) > 0 ) :
@@ -195,7 +218,6 @@
                 }
             }
 
-
             if($custom_product->has_child()) {   
                     $custom_variations = $product_variation;
 
@@ -211,7 +233,6 @@
                     $color = $custom_product->get_attribute('Color');
             }
              
-
             array_push( $productResults['products'], [
                 'name'              => $custom_product->get_name(),
                 'slug'              => $custom_product->get_slug(),
@@ -222,8 +243,7 @@
                 'variationPrice'    => $variationPrice,
 
                 'custom_variations' => $product_variation,
-                'color' => $color
-
+                'color' => $color,
             ]);
 
         endforeach;
@@ -233,12 +253,14 @@
     }
 
     function filter_options() {
+        global $product;
 
-        // $response
+        $response = [
+            "colors" => get_terms("pa_color"),
+            // "max-price" => woocommerce_price()
+        ];
 
-        $terms = get_terms("pa_color");
-
-        return  $terms;
+        return $response;
     }
     
     add_action('rest_api_init', 'register_routes');
@@ -256,16 +278,20 @@
             'method' => 'GET',
             'callback' => 'filter_options'
         ));
-        register_rest_route( 'wc/v3', '/custom-product-list(?:/(?P<custom_page>\d+))?', array(
+        register_rest_route( 'wc/v3', '/custom-product-list?(?:page=(?P<page>[\d]+))?', array(
             'method' => 'GET',
             'callback' => 'custom_product_list',
-            'args' => [
-                'custom_page'
-            ],
+            'args' => array(
+                'page',
+                'colors'
+            ),
         ));
         
     }
-    
+    // preg_match('/custom_page=(?P<custom_page>\d*)&custom_colors=(?P<custom_colors>[^&]*)/', $input_line, $output_array);
+    function wp_slug( $slug ) {
+        return $slug['$slug'];
+    }
     
 
 // filter[limit]=25&filter[offset]="+offset;
