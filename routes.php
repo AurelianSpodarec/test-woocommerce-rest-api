@@ -278,7 +278,7 @@
             'method' => 'GET',
             'callback' => 'filter_options'
         ));
-        register_rest_route( 'wc/v3', '/custom-product-list?(?:page=(?P<page>[\d]+))?', array(
+        register_rest_route( 'wc/v3', '/custom-product-list?(?:page=(?P<page>[\d]+))?(?:color=(?P<color>[a-zA-z))', array(
             'method' => 'GET',
             'callback' => 'custom_product_list',
             'args' => array(
@@ -289,10 +289,7 @@
         
     }
     // preg_match('/custom_page=(?P<custom_page>\d*)&custom_colors=(?P<custom_colors>[^&]*)/', $input_line, $output_array);
-    function wp_slug( $slug ) {
-        return $slug['$slug'];
-    }
-    
+
 
 // filter[limit]=25&filter[offset]="+offset;
 
