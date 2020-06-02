@@ -144,9 +144,9 @@
         };
        
         if ( isset( $args['colors'])) {
-            $custom_colors = $args['colors'];
+            $custom_colors =explode(',', $args['colors']);
         }
-
+       
         // $custom_page = "papa";
         // $custom_colors = "tes";
         
@@ -177,14 +177,14 @@
             // 'tax_query'      => array( array(
             //     'taxonomy'        => 'pa_color',
             //     'field'           => 'slug',
-            //     'terms'           =>  'red',
+            //     'terms'           =>  $custom_colors,
             //     'operator'        => 'IN',
             // ) ),
             'tax_query' => array( 
                 array(
                     'taxonomy'      => 'pa_color',
                     'field'         => 'slug',
-                    'terms'         => $custom_colors,
+                    'terms'         => $custom_colors,//$custom_colors,
                     'operator'      => 'IN'
                 ),
             ),
@@ -206,7 +206,7 @@
             "limit"    => $limit,
             "products" => [],
             // "pageee" => $page,
-            "colors" => $custom_colors,
+            "colors" =>  $custom_colors,
             "test " => $test,
             // "args" => $args['custom_page']
         ];
