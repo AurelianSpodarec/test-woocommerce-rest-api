@@ -139,9 +139,13 @@
         $offset = 0;
         $limit = 9;
         
-        $custom_page = $args['page'];
-        // $custom_colors = $args['colors'];
-
+        if ( isset( $args['page'])) {
+            $custom_page = $args['page'];
+        };
+       
+        if ( isset( $args['colors'])) {
+            $custom_colors = $args['colors'];
+        }
 
         // $custom_page = "papa";
         // $custom_colors = "tes";
@@ -173,9 +177,17 @@
             // 'tax_query'      => array( array(
             //     'taxonomy'        => 'pa_color',
             //     'field'           => 'slug',
-            //     'terms'           =>  array('red'),
+            //     'terms'           =>  'red',
             //     'operator'        => 'IN',
             // ) ),
+            'tax_query' => array( 
+                array(
+                    'taxonomy'      => 'pa_color',
+                    'field'         => 'slug',
+                    'terms'         => $custom_colors,
+                    'operator'      => 'IN'
+                ),
+            ),
             
         ) );
  
@@ -188,6 +200,7 @@
 
         $productResults = [
             "total"    => $products->total,
+            "totalPages" => floor(($limit / $products->total) * 10),
             "offset"   => $offset,
             "page"     => $custom_page,
             "limit"    => $limit,
@@ -260,12 +273,29 @@
             // "max-price" => woocommerce_price()
         ];
 
-        return $response;
+        return rest_ensure_response($response);
+    }
+
+    function get_args( ) {
+
+
+        $response = [];
+
+        $args = array();
+
+        $args['page'] = array(
+            'type'        => 'number',
+        );
+        // var_dump($args, "sd");
+        return $args;
     }
     
     add_action('rest_api_init', 'register_routes');
     function register_routes() {
-        
+
+        // $str = '/custom-product-list?(?:page=(?P<page>[\d]+))?';
+        // parse_str($str, $output);
+
         register_rest_route( 'wc/v3', '/product/slug=(?P<slug>[a-zA-Z0-9-]+)', array(
             'method' => 'GET',
             'callback' => 'single_product_by_slug'
@@ -278,13 +308,10 @@
             'method' => 'GET',
             'callback' => 'filter_options'
         ));
-        register_rest_route( 'wc/v3', '/custom-product-list?(?:page=(?P<page>[\d]+))?(?:color=(?P<color>[a-zA-z))', array(
+        register_rest_route( 'wc/v3', '/custom-product-list', array(
             'method' => 'GET',
             'callback' => 'custom_product_list',
-            'args' => array(
-                'page',
-                'colors'
-            ),
+            'args' => get_args(),
         ));
         
     }
