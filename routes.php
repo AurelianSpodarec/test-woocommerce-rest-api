@@ -165,6 +165,15 @@
             'return'   => 'ids',
             'orderby' => 'price',
             'paginate' => true,
+            // 'tax_query' => array( 
+            //     array(
+            //         'taxonomy'      => 'pa_color',
+            //         'field'         => 'slug',
+            //         'terms'         => $custom_colors,//$custom_colors,
+            //         'operator'      => 'IN'
+            //     ),
+            // ),
+
             // 'meta_query'     => array( 
             //     array(
             //         'key' => '_regular_price',
@@ -174,20 +183,8 @@
             //     )
             
             // ),
-            // 'tax_query'      => array( array(
-            //     'taxonomy'        => 'pa_color',
-            //     'field'           => 'slug',
-            //     'terms'           =>  $custom_colors,
-            //     'operator'        => 'IN',
-            // ) ),
-            'tax_query' => array( 
-                array(
-                    'taxonomy'      => 'pa_color',
-                    'field'         => 'slug',
-                    'terms'         => $custom_colors,//$custom_colors,
-                    'operator'      => 'IN'
-                ),
-            ),
+      
+           
             
         ) );
  
