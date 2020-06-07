@@ -64,6 +64,7 @@
         if($product->has_child()) {
             $variations = $product->get_available_variations();
             $data = [
+                'id' => $product->get_id(),
                 'name' => $product->get_name(),
                 'price' => $product->get_price(),
                 'regular_price' => $product->get_regular_price(),
@@ -94,6 +95,7 @@
             ];
         } else {
             $data = [
+                'id' => $product->get_id(),
                 'name' => $product->get_name(),
                 'price' => $product->get_price(),
                 'regular_price' => $product->get_regular_price(),
