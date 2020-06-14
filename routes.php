@@ -134,20 +134,16 @@
     function custom_product_list( $args ) {
         global $product;
 
-        var_dump("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", $args['price']);
+        // var_dump("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", $args['price']);
 
         $offset = 0;
         $limit = 9;
 
-        if ( isset( $args['price'])) {
-            $min_price = $args['price']['min'];
-            $max_price = $args['price']['max'];
-        } else {
-            $min_price = 0;
-            $max_price = 99999;
-        }
+       
 
-        if ( isset( $args['page'])) {
+        // var_dump($min_price, $max_price);
+
+        if ( isset( $args['page']['d'])) {
             $custom_page = $args['page'];
         } else {
             $custom_page = 1;
@@ -160,9 +156,19 @@
             $custom_colors = '';
             $custom_operator = "OUT";
         }
-       
-      
-        // var_dump($args['page']);
+
+        if ( isset( $args['price'])) {
+            $min_price = intval($args['price']['min']);
+            $max_price = intval($args['price']['max']);
+        } else {
+            $min_price = 0;
+            $max_price = 99999;
+        };
+
+        // $min_price = intval('0');
+        // $max_price = intval('5');
+
+        // var_dump($min_price, $max_price);
         $query_args =   array(
             'page'   => $custom_page,
             'limit' => $limit,
@@ -244,6 +250,9 @@
             ]);
 
         endforeach;
+            // array_push( $productResults['products'], [
+                
+            // ];
         endif;
 
         return $productResults;
@@ -320,101 +329,3 @@
         ));
         
     }
-    // preg_match('/custom_page=(?P<custom_page>\d*)&custom_colors=(?P<custom_colors>[^&]*)/', $input_line, $output_array);
-
-
-// filter[limit]=25&filter[offset]="+offset;
-
-
-
-//     add_filter( 'woocommerce_product_data_store_cpt_get_products_query', 'custom_change_products_response', 10, 2 );
-// function custom_change_products_response($query, $query_vars) {
-//     // if ( ! empty( $query_vars['customvar'] ) ) {
-// 	// 	$query['meta_query'][] = array(
-// 	// 		'key' => 'customvar',
-// 	// 		'value' => esc_attr( $query_vars['customvar'] ),
-// 	// 	);
-//     // }
-    
-//     $let = ["sdfsfdsfsf"];
-
-//     return $let;
-// } 
-  
-
-// // // https://github.com/woocommerce/woocommerce/wiki/wc_get_products-and-WC_Product_Query
-// // add_filter( 'wp_rest_filter_add_filter_param', 'handle_custom_query_var', 10, 2 );
- 
-
-// // function handle_custom_query_var( $query, $query_vars ) {
-   
-
-// //     return "sdsd";
-// //  }
-
-// //  add_filter( 'woocommerce_product_data_store_cpt_get_products_query', 'handle_custom_query_var', 10, 2 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function custom_change_product_response($response, $object, $request) {
-
-//     $variations = $response->data['variations'];
-//     $variations_res = [];
-//     $variations_array = [];
-
-//     if (!empty($variations) && is_array($variations)) {
-//         foreach ($variations as $variation) {
-//             $variation_id = $variation;
-//             $variation = new WC_Product_Variation($variation_id);
-
-//             $variations_res['id'] = $variation_id;
-//             $variations_res['on_sale'] = $variation->is_on_sale();
-//             $variations_res['regular_price'] = (float)$variation->get_regular_price();
-//             $variations_res['sale_price'] = (float)$variation->get_sale_price();
-//             $variations_res['sku'] = $variation->get_sku();
-//             $variations_res['quantity'] = $variation->get_stock_quantity();
-//             $variations_res['image'] = wp_get_attachment_image_src(get_post_thumbnail_id( $variation_id ), false );;
-
-//             if ($variations_res['quantity'] == null) {
-//                 $variations_res['quantity'] = '';
-//             }
-            
-//             $variations_res['stock'] = $variation->get_stock_quantity();
-
-//             $attributes = array();
-//             // variation attributes
-//             foreach ( $variation->get_variation_attributes() as $attribute_name => $attribute ) {
-//                 // taxonomy-based attributes are prefixed with `pa_`, otherwise simply `attribute_`
-//                 $attributes[] = array(
-//                     'name'   => wc_attribute_label( str_replace( 'attribute_', '', $attribute_name ), $variation ),
-//                     'slug'   => str_replace( 'attribute_', '', wc_attribute_taxonomy_slug( $attribute_name ) ),
-//                     'attribute_pa_color' => $attribute,
-//                 );
-//             }
-
-//             $variations_res['attributes'] = $attributes;
-//             $variations_array[] = $variations_res;
-//         }
-//     }
-//     $response->data['product_variations'] = $variations_array;
-
-//     return $response;
-// }
-// add_filter('woocommerce_rest_prepare_product_object', 'custom_change_product_response', 20, 3);
-// add_filter('woocommerce_rest_prepare_product_variation_object', 'custom_change_product_response', 20, 3);
-
-
