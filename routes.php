@@ -43,7 +43,6 @@
         if ( empty( $post ) ) {
             return null;
         }
-        // print_r($slug);
         return $data;
     }
 
@@ -73,7 +72,6 @@
                 'stock_quantity' => $product->get_stock_quantity(),
 
                 // 'stock_quantity' => $product->get_available_variations(),
-
 
                 'stock_status' => $product->get_stock_status(),
                 'backorders' => $product->get_backorders(),
@@ -123,7 +121,6 @@
             ];
         }
         
-        
         if ( empty( $post ) ) {
             return null;
         }
@@ -138,10 +135,8 @@
 
         $offset = 0;
         $limit = 9;
-
-       
-
-        // var_dump($min_price, $max_price);
+        $orderby = 'date';
+        $order = 'desc';
 
         if ( isset( $args['page']['d'])) {
             $custom_page = $args['page'];
@@ -165,22 +160,21 @@
             $max_price = 99999;
         };
 
-        // $min_price = intval('0');
-        // $max_price = intval('5');
 
-        // var_dump($min_price, $max_price);
+
+
         $query_args =   array(
             'page'   => $custom_page,
             'limit' => $limit,
             'paginate' => true,
-            'orderby'  => 'date',
-            'order'    => 'DESC',
+            'orderby'  => $orderby,
+            'order'    => $order,
             'price_between' => array($min_price, $max_price),
             'tax_query' => array( 
                 array(
                     'taxonomy'      => 'pa_color',
                     'field'         => 'slug',
-                    'terms'         => $custom_colors,//$custom_colors,
+                    'terms'         => $custom_colors, //$custom_colors,
                     'operator'      => $custom_operator
                 ),
             ),
@@ -188,6 +182,7 @@
         );
         $query = new WC_Product_Query( $query_args );
 
+        
 
         $products = $query->get_products();
 
@@ -250,15 +245,11 @@
             ]);
 
         endforeach;
-            // array_push( $productResults['products'], [
-                
-            // ];
         endif;
 
         return $productResults;
     }
 
-    
     add_filter( 
         'woocommerce_product_data_store_cpt_get_products_query', 
         function ( $query, $query_vars ) {
@@ -277,8 +268,6 @@
     );
 
 
-
-
     function filter_options() {
         global $product;
 
@@ -292,7 +281,6 @@
 
     function get_args( ) {
 
-
         $response = [];
 
         $args = array();
@@ -300,16 +288,12 @@
         $args['page'] = array(
             'type'        => 'number',
         );
-        // var_dump($args, "sd");
         return $args;
     }
     
+    
     add_action('rest_api_init', 'register_routes');
     function register_routes() {
-
-        // $str = '/custom-product-list?(?:page=(?P<page>[\d]+))?';
-        // parse_str($str, $output);
-
         register_rest_route( 'wc/v3', '/product/slug=(?P<slug>[a-zA-Z0-9-]+)', array(
             'method' => 'GET',
             'callback' => 'single_product_by_slug'
@@ -326,6 +310,6 @@
             'method' => 'GET',
             'callback' => 'custom_product_list',
             'args' => get_args(),
-        ));
-        
+        ));   
     }
+    
