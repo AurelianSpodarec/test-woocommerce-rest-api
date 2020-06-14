@@ -72,7 +72,7 @@
                 'image' => $attachment,
                 'stock_quantity' => $product->get_stock_quantity(),
 
-                'stock_quantity' => $product->get_available_variations(),
+                // 'stock_quantity' => $product->get_available_variations(),
 
 
                 'stock_status' => $product->get_stock_status(),
@@ -131,69 +131,57 @@
         return $data;
     }
 
-
-
-    // , $fr_products_per_page
     function custom_product_list( $args ) {
         global $product;
 
+        var_dump("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", $args['price']);
 
         $offset = 0;
         $limit = 9;
-        
+
+        if ( isset( $args['price'])) {
+            $min_price = $args['price']['min'];
+            $max_price = $args['price']['max'];
+        } else {
+            $min_price = 0;
+            $max_price = 99999;
+        }
+
         if ( isset( $args['page'])) {
             $custom_page = $args['page'];
-        };
-       
+        } else {
+            $custom_page = 1;
+        }
+
         if ( isset( $args['colors'])) {
-            $custom_colors =explode(',', $args['colors']);
+            $custom_colors = explode(',', $args['colors']);
+            $custom_operator = "IN";
+        } else {
+            $custom_colors = '';
+            $custom_operator = "OUT";
         }
        
-        // $custom_page = "papa";
-        // $custom_colors = "tes";
-        
+      
         // var_dump($args['page']);
-
-        // Search products between X and Y price
-
-
-        $query = new WC_Product_Query( array(
+        $query_args =   array(
             'page'   => $custom_page,
             'limit' => $limit,
             'paginate' => true,
-
             'orderby'  => 'date',
             'order'    => 'DESC',
-            'return'   => 'ids',
-            'orderby' => 'price',
-            'paginate' => true,
-            // 'tax_query' => array( 
-            //     array(
-            //         'taxonomy'      => 'pa_color',
-            //         'field'         => 'slug',
-            //         'terms'         => $custom_colors,//$custom_colors,
-            //         'operator'      => 'IN'
-            //     ),
-            // ),
+            'price_between' => array($min_price, $max_price),
+            'tax_query' => array( 
+                array(
+                    'taxonomy'      => 'pa_color',
+                    'field'         => 'slug',
+                    'terms'         => $custom_colors,//$custom_colors,
+                    'operator'      => $custom_operator
+                ),
+            ),
+            'return'   => 'ids'
+        );
+        $query = new WC_Product_Query( $query_args );
 
-            // 'meta_query'     => array( 
-            //     array(
-            //         'key' => '_regular_price',
-            //         'value' => array(50, 100),
-            //         'compare' => 'BETWEEN',
-            //         'type' => 'NUMERIC'
-            //     )
-            
-            // ),
-      
-           
-            
-        ) );
- 
-        // $args = array (
-        //     'value' => array( 20, 30 ),  
-        // );
-        // $min_max_price = wc_get_min_max_price_meta_query(  $args );
 
         $products = $query->get_products();
 
@@ -204,10 +192,8 @@
             "page"     => $custom_page,
             "limit"    => $limit,
             "products" => [],
-            // "pageee" => $page,
             "colors" =>  $custom_colors,
             "test " => $test,
-            // "args" => $args['custom_page']
         ];
 
         if ( sizeof($products) > 0 ) :
@@ -216,7 +202,6 @@
             $attachment_ids[0] = get_post_thumbnail_id( $productID );
             $attachment        = wp_get_attachment_image_src($attachment_ids[0], false );
             $custom_product    = wc_get_product($productID);
-
 
             $product_variation = [];
             if($custom_product->has_child()) {
@@ -232,7 +217,6 @@
 
             if($custom_product->has_child()) {   
                     $custom_variations = $product_variation;
-
                     $variationPrice = [
                         'min' => $custom_product->get_variation_price(),
                         'max' => $custom_product->get_variation_price('max')
@@ -246,6 +230,7 @@
             }
              
             array_push( $productResults['products'], [
+                'id'                => $custom_product->get_id(),
                 'name'              => $custom_product->get_name(),
                 'slug'              => $custom_product->get_slug(),
                 'price'             => $custom_product->get_price(),
@@ -263,6 +248,27 @@
 
         return $productResults;
     }
+
+    
+    add_filter( 
+        'woocommerce_product_data_store_cpt_get_products_query', 
+        function ( $query, $query_vars ) {
+            if ( ! empty( $query_vars['price_between'] ) ) {
+                $query['meta_query'][] = array(
+                    'key'     => '_price',
+                    'value'   => $query_vars['price_between'],
+                    'type'    => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                );
+            }
+            return $query;
+        },
+        10,
+        2
+    );
+
+
+
 
     function filter_options() {
         global $product;
