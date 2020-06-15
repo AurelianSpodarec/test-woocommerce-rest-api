@@ -138,7 +138,7 @@
         $orderby = 'date';
         $order = 'desc';
 
-        if ( isset( $args['page']['d'])) {
+        if ( isset( $args['page'])) {
             $custom_page = $args['page'];
         } else {
             $custom_page = 1;
@@ -160,9 +160,6 @@
             $max_price = 99999;
         };
 
-
-
-
         $query_args =   array(
             'page'   => $custom_page,
             'limit' => $limit,
@@ -182,7 +179,7 @@
         );
         $query = new WC_Product_Query( $query_args );
 
-        
+
 
         $products = $query->get_products();
 
