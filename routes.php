@@ -171,7 +171,7 @@
                 array(
                     'taxonomy'      => 'pa_color',
                     'field'         => 'slug',
-                    'terms'         => $custom_colors, //$custom_colors,
+                    'terms'         => $custom_colors,
                     'operator'      => $custom_operator
                 ),
             ),
