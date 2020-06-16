@@ -1,6 +1,4 @@
 <?php
-
-
  /*
    Plugin Name: Custom API
    Plugin URI: 
@@ -72,7 +70,6 @@
                 'stock_quantity' => $product->get_stock_quantity(),
 
                 // 'stock_quantity' => $product->get_available_variations(),
-
                 'stock_status' => $product->get_stock_status(),
                 'backorders' => $product->get_backorders(),
                 "variations" => $variations = $product->get_available_variations(),
