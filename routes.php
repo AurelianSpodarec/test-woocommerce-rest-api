@@ -43,7 +43,7 @@
         }
         return $data;
     }
-
+ 
     function products_by_slug_variation( $slug ) {
         global $product;
 
