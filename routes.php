@@ -2,7 +2,7 @@
  /*
    Plugin Name: Custom API
    Plugin URI: 
-   description: Custom API routes for WooCommerce
+   description: Code for bespoke theme - do NOT disable
    Version: 
    Author:  
    Author URI:  
@@ -29,8 +29,6 @@
                 'sale_to' => $product->get_date_on_sale_to(),
 
                 'stock_quantity' => $product->get_stock_quantity(),
-
-             
                 
                 'colors' => array($product->get_attribute( 'color' )),
                 'images' => $product->get_image(),
