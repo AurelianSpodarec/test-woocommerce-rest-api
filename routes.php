@@ -141,10 +141,10 @@
 
         if ( isset( $args['colors'])) {
             $custom_colors = explode(',', $args['colors']);
-            $custom_operator = "IN";
+            $custom_operator = "IN"; 
         } else {
             $custom_colors = '';
-            $custom_operator = "OUT";
+            $custom_operator = "OUT"; 
         }
 
         if ( isset( $args['price'])) {
