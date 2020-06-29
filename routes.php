@@ -127,7 +127,6 @@
         global $product;
 
         // var_dump("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", $args['price']);
-
         $offset = 0;
         $limit = 9;
         $orderby = 'date';
