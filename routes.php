@@ -138,7 +138,7 @@
             $custom_page = 1;
         }
 
-        if ( isset( $args['colors'])) {
+        if ( isset( $args['colors']) && !empty( $args['colors'])) {
             $custom_colors = explode(',', $args['colors']);
             $custom_operator = "IN"; 
         } else {
