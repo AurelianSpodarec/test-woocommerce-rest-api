@@ -302,5 +302,24 @@
             'callback' => 'custom_product_list',
             'args' => get_args(),
         ));   
-    }
+        
+    } 
     
+ 
+    add_filter( 'allowed_http_origins', 'add_localhost_origin' );
+function add_localhost_origin( $origins ) {
+    $origins[] = 'http://localhost:3000';
+    return $origins;
+}
+ 
+function add_cors_http_header(){
+    $method = $_SERVER['REQUEST_METHOD'];
+    if ($method == "OPTIONS") {
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method,Access-Control-Request-Headers, Authorization, OTHER HEADERS YOU WANT");
+        header("HTTP/1.1 200 OK");
+        die();
+    }
+}
+
+add_action('init','add_cors_http_header');
