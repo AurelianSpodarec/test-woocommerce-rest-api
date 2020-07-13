@@ -2,7 +2,7 @@
  /*
    Plugin Name: Custom API
    Plugin URI: 
-   description: Code for bespoke theme - do NOT disable
+   description: Code for bespoke theme - do NOT disabled
    Version: 
    Author:  
    Author URI:  
